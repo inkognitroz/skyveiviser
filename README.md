@@ -5,6 +5,7 @@ En veiviser til skyen for norske virksomheter, helt lokalt.
 Disclaimer: 
 Dette er ikke en offisiell applikasjon, men en ufoffisiell veileder i beta versjon, veilederen kan innheholde feilaktige og utdaterte opplysninger. 
 
+
 **Spør om skyanskaffelser. Se kildene. Kjør modellen lokalt.**
 
 Et lite Python-program med lokale kildesammendrag om skyanskaffelser. 
@@ -16,6 +17,7 @@ Klargjort for lokal utprøving med åpne opplysninger — ikke for offentlig web
 Du trenger **Python 3.10+**, **Ollama som kjører**, og **en installert lokal modell** på samme maskin. Ingen ekstra Python-pakker trengs.
 
 1. **[Last ned siste Skyveiviser som ZIP](https://github.com/inkognitroz/skyveiviser/archive/refs/heads/main.zip)** og pakk den ut i **Nedlastinger**. Mappen heter **skyveiviser-main**.
+
 2. Åpne **Terminal** og kjør én gang:
 
    ```bash
@@ -24,7 +26,7 @@ Du trenger **Python 3.10+**, **Ollama som kjører**, og **en installert lokal mo
 
 3. Åpne **http://127.0.0.1:8765** i nettleseren, velg en modell og still spørsmålet.
 
-La Terminal stå åpen. Stopp med **Ctrl + C**. `--ollama` kobler til modellmotoren; det installerer eller laster ikke ned noe.
+La Terminal stå åpen. `--ollama` kobler til modellmotoren; det installerer eller laster ikke ned noe.
 
 **Hurtigvalg øverst:** Avtaleoversikt → Avrop på CIPS → Spør om VM → Slå opp virksomhet.
 De tre første viser resultat med ett klikk. Virksomhetsknappen åpner søket.
@@ -73,7 +75,7 @@ Den leser **ikke nettstedene på nytt**, og modellen er **ikke trent på MPS**. 
 
 Bruk bare åpne testopplysninger. Appen lagrer ikke samtaler automatisk; eksport er et aktivt valg. Kilde-ID-kontroll er ikke faglig faktasjekk. Les originalkildene før bruk. Dette er ikke en offisiell DFØ-tjeneste eller juridisk rådgivning.
 
-Serveren er begrenset til egen maskin (`127.0.0.1`). Ikke åpne den for LAN eller internett. Kontroller at den separate Ollama-tjenesten har skyfunksjoner deaktivert; se [Ollamas veiledning](https://docs.ollama.com/faq). Appen endrer ikke Ollama-oppsettet. Å åpne originalkildene krever nettverk.
+Serveren er begrenset til egen maskin (`127.0.0.1`). Ikke åpne den for LAN eller internett. Kontroller at den separate Ollama-tjenesten har skyfunksjoner deaktivert; se [Ollamas veiledning](https://docs.ollama.com/faq). Appen endrer ikke Ollama-oppsettet. Å åpne originalkildene krever nettverk.crtl c avslutter ollama i terminalen.
 
 ## For den som vil forstå eller tilpasse
 
