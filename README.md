@@ -1,8 +1,15 @@
 # Skyveiviser
 
+En veiviser til skyen for norske virksomheter, helt lokalt. 
+
+Disclaimer: 
+Dette er ikke en offisiell applikasjon, men en ufoffisiell veileder i beta versjon, veilederen kan innheholde feilaktige og utdaterte opplysninger. 
+
 **Spør om skyanskaffelser. Se kildene. Kjør modellen lokalt.**
 
-Et lite Python-program med lokale kildesammendrag om skyanskaffelser, en datert kundeliste og valgfri språkmodell gjennom Ollama. Klargjort for lokal utprøving med åpne opplysninger — ikke for offentlig webdrift.
+Et lite Python-program med lokale kildesammendrag om skyanskaffelser. 
+En datert kundeliste og valgfri språkmodell gjennom Ollama. 
+Klargjort for lokal utprøving med åpne opplysninger — ikke for offentlig webdrift.
 
 ## Kom i gang på Mac
 
@@ -25,7 +32,7 @@ Pakket ut et annet sted? Skriv `cd ` med mellomrom, dra **skyveiviser**-mappen i
 
 ## Avtaler, avrop og kundeliste
 
-Kildeutvalget dekker seks inngåtte avtaleområder: CIPS, Cloud R&A, CRS, Training & Awareness, TPPCM og CTI. Avropsveiledninger og vanlige spørsmål er lagt til. Dette er korte sammendrag av offentlige kilder, ikke endelige kontrakter eller priser.
+Kildeutvalget dekker seks inngåtte avtaleområder: CIPS, Cloud R&A, CRS, Training & Awareness, TPP og CTI. Avropsveiledninger og vanlige spørsmål er lagt til. Dette er korte sammendrag av offentlige kilder, ikke endelige kontrakter eller priser.
 
 **Prøv:** «Hvilke avtaler har MPS inngått?», «Hvordan gjør vi avrop på CIPS?» eller «Hva gjelder CTI-avtalen?»
 
