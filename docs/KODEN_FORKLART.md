@@ -24,10 +24,12 @@ Ollama og modellfilene ligger **utenfor** denne pakken. Ollama er programmet som
 ## 2. Hva startkommandoen betyr
 
 ```bash
-cd "$HOME/Downloads/Skyveiviser-delingspakke/skyveiviser" && python3 app.py --ollama
+cd "$HOME/Downloads/skyveiviser-main" && python3 app.py --ollama
 ```
 
 `cd` betyr «gå til denne mappen». `$HOME` er hjemmemappen til den innloggede brukeren. Anførselstegnene sørger for at mellomrom i stien ikke deler den opp. `&&` betyr at neste kommando bare kjøres hvis bytte av mappe lyktes. `python3 app.py` kjører Python-filen. `--ollama` er et valg som gir appen lov til å kontakte den lokale modellmotoren.
+
+GitHubs «Last ned»-lenke gir mappen `skyveiviser-main`. Den valgfrie, lokalt bygde delingspakken fra `tools/package.py` bruker i stedet `Skyveiviser-delingspakke/skyveiviser`; kommandoen må peke på mappen som inneholder `app.py`.
 
 Kommandoen starter allerede programmet; den skal ikke kjøres to ganger. Åpning av nettleseren starter ikke Python på nytt.
 
@@ -205,3 +207,18 @@ For å tilpasse eksemplet: endre sammendrag, søkeord og dato i `corpus.json`, b
 [Ollama chat-API](https://docs.ollama.com/api/chat) · [Modelliste](https://docs.ollama.com/api/tags) · [Ollama og lokal drift](https://docs.ollama.com/faq) · [Python HTTP-server](https://docs.python.org/3/library/http.server.html)
 
 Forklaringen beskriver denne versjonens kode. Modellmotorens dokumentasjon må kontrolleres mot versjonen som brukes.
+
+
+## Oppdatering 0.4: fire hurtigvalg og automatisk tilslutningsoppslag
+
+`choose_mode()` i `engine.py` velger direkte oppslag før et eventuelt modellkall. Tilslutningsspørsmål går til `customers.lookup()`, avtaleoversikt til `catalogue()`, og VM-spørsmål til kildevisning med datert status. Disse rutene kaller ikke en språkmodell. Andre fagspørsmål bruker den eksisterende søke-/modellflyten.
+
+`entity_query()` i `customers.py` henter virksomheten i et enkelt uttrykk som «Jeg jobber i Asker kommune». `find_customer_rows()` matcher organisasjonsnummer eksakt, eller navn mot tabellen. Dette er enkle, synlige regler, ikke en generell språkforståelse. Ingen fuzzy gjetting brukes. Flere treff bevares hver for seg; ukjent virksomhet og spørsmål uten navn gir henholdsvis manglende treff og spørsmål om navn.
+
+`renderCustomers()` viser én virksomhet som en oversikt over avtaleområder og tabellverdier. Ja og Via listes som registrerte tilslutninger for de seks inngåtte områdene. VM holdes separat som kommende, også når kundelisten sier Ja. Nei og tomt felt beholder sin betydning. Asker kommune er i denne kopien merket Nei i alle kolonnene.
+
+`vm.json` er en liten tilleggsfil ved siden av `corpus.json`: den inneholder kilde S25 og en separat `plan`. Dermed endres ikke kundelistens 620 rader når fremdriftsplanen oppdateres. `load_corpus()` leser begge og beregner et fingeravtrykk av begge filene. Eldre pakker uten VM-filen kan leses uten å finne på en dato. Feil format i en eksisterende VM-fil avvises.
+
+Oktober 2026 er en foreløpig planopplysning, ikke offentlig kildebekreftet tildeling. `publicly_confirmed` er false. Planen sendes ikke til modellen som et offentlig kildeutsagn; den vises separat med forbehold. Modellen brukes heller ikke til å skrive tilslutningsresultatene.
+
+Hurtigknappene i `web/app.js` utfører de tre første oppslagene med ett klikk. Virksomhetsknappen åpner et tomt søkefelt. Knapper og inndata låses mens en forespørsel pågår. Et gammelt resultat fjernes før neste spørsmål, også dersom neste kall feiler.

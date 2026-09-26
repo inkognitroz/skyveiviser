@@ -1,0 +1,35 @@
+{
+  "version": "2026-09-26.3",
+  "source": {
+    "id": "S25",
+    "title": "VM: sårbarhetshåndtering – kommende anskaffelse",
+    "url": "https://markedsplassen.anskaffelser.no/avtaler/vulnerability-scanning",
+    "section": "Avtaleinnhold og tilslutning; status må leses sammen med septembernyhetsbrevet",
+    "reviewed_at": "2026-09-26",
+    "keywords": [
+      "vm",
+      "vulnerability",
+      "management",
+      "sårbarhet",
+      "sårbarhetshåndtering",
+      "sårbarheter",
+      "skanning",
+      "prioritering",
+      "tildeling",
+      "fremdrift",
+      "status"
+    ],
+    "agreement_ids": [
+      "vm"
+    ],
+    "text": "Vulnerability Management (VM) er en pågående felles anskaffelse av skybasert sårbarhetshåndtering for norsk og svensk offentlig sektor. Tjenestene skal identifisere og vurdere sårbarheter i IKT-infrastruktur, slik at virksomhetene kan redusere risiko før svakhetene utnyttes. Avtalen er planlagt som frivillig og ikke-eksklusiv. Septembernyhetsbrevet 2026 oppgir fortsatt forhandlinger; ingen tildeling, signering eller åpning for avrop bekreftes i dette kildegrunnlaget. Avtalesiden har en eldre tentativ fremdriftsplan. Bruk oppdatert informasjon fra MPS før planlegging av avrop."
+  },
+  "plan": {
+    "expected_award_month": "2026-10",
+    "as_of": "2026-09-26",
+    "publicly_confirmed": false,
+    "provenance": "Foreløpig plan oppgitt ved oppdatering av demonstratoren; ikke bekreftet i de lenkede offentlige kildene.",
+    "display": "Planlagt tildeling: oktober 2026 (foreløpig plan).",
+    "notice": "Datoen er ikke offentlig kildebekreftet i denne versjonen. Tildeling er ikke det samme som signering eller åpning for avrop."
+  }
+}

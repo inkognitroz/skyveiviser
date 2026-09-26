@@ -24,7 +24,7 @@ class EngineTests(unittest.TestCase):
     def setUp(self): self.c = load_corpus()
     def test_original_sources_retained(self):
         self.assertEqual([s['id'] for s in self.c['sources'][:5]], ['S1','S2','S3','S4','S5'])
-        self.assertEqual(len(self.c['sources']), 24)
+        self.assertEqual(len(self.c['sources']), 25)
     def test_sha(self): self.assertEqual(len(self.c['sha256']), 64)
     def test_market_dialog(self): self.assertEqual(retrieve('Hvordan forbereder vi en markedsdialog?',self.c)[0]['id'],'S2')
     def test_security(self): self.assertEqual(retrieve('Hva sier referansearkitekturen om sikkerhet?',self.c)[0]['id'],'S3')

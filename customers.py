@@ -52,6 +52,58 @@ def validate_register(register: dict | None, source_ids: set[str]) -> None:
                 raise ValueError('Ukjent tabellverdi; kontroller kundelisten.')
 
 
+def membership_question(query: str) -> bool:
+    """Recognise a membership request; a missing entity must ask for clarification."""
+    if not isinstance(query, str):
+        return False
+    key = normalized(query)
+    return bool(re.search(
+        r"\b(?:tilsluttet|tilslutta|tilslutning|tillsluttet|omfattet|avropsrett)\b"
+        r"|\b(?:hvilke|hva) avtaler (?:har|kan|er) (?:jeg|vi|min|vår)\b"
+        r"|\bkan (?:jeg|vi) (?:bruke|benytte|avrope)\b", key))
+
+
+def entity_query(query: str) -> str:
+    """Take the stated employer, not an unrelated organisation later in the sentence."""
+    subject = re.search(
+        r"\b(?:jeg|vi)\s+(?:jobber|arbeider|er\s+ansatt)\s+(?:i|hos|på|for)\s+"
+        r"(.+?)(?=[,;?!]|\s+[–—]|\s+(?:og\s+)?(?:er|har|kan|hvilke|hva)\b|$)",
+        query, re.IGNORECASE)
+    return subject.group(1).strip() if subject else query.strip()
+
+
+def find_customer_rows(query: str, register: dict) -> tuple[list, str]:
+    """Exact numbers first, then bounded names. Ambiguous rows are not merged."""
+    rows = register['rows']
+    # Match nine digits, allowing visual grouping, but not a substring of a longer number.
+    numbers = re.findall(r"(?<![\d])(?:\d[ ]*){8}\d(?![ ]*\d)", query)
+    if numbers:
+        wanted = {re.sub(r'\s', '', n) for n in numbers}
+        return [r for r in rows if r[0] in wanted], 'orgnr'
+    subject = entity_query(query)
+    key = normalized(subject)
+    if not key:
+        return [], 'name_required'
+    exact = [r for r in rows if normalized(r[1]) == key]
+    if exact:
+        return exact, 'name'
+    if subject != query.strip():
+        # Do not pick a different municipality elsewhere in a sentence.
+        return [r for r in rows if key in normalized(r[1])], 'name'
+    if membership_question(query):
+        matches = [r for r in rows if ' '+normalized(r[1])+' ' in ' '+key+' ']
+        if matches:
+            return matches, 'name'
+        # Allow a short place name, e.g. "Er Asker tilsluttet?", only as whole words.
+        place = re.search(r"\b(?:er|har)\s+(.+?)\s+(?:tilsluttet|tilslutta|tillsluttet|avropsrett|omfattet)\b", key)
+        if place:
+            name = place.group(1).strip()
+            if name not in {'jeg','vi','min virksomhet','vår virksomhet','virksomheten'}:
+                return [r for r in rows if ' '+name+' ' in ' '+normalized(r[1])+' '], 'name'
+        return [], 'name_required'
+    return [r for r in rows if key in normalized(r[1])], 'name'
+
+
 def lookup(query: str, register: dict | None) -> dict:
     if register is None:
         raise ValueError('Denne kildefilen inneholder ingen kundeliste.')
@@ -70,15 +122,7 @@ def lookup(query: str, register: dict | None) -> dict:
         shown_columns = [{'id': selected_agreement['id'], 'index': index,
                           'title': selected_agreement['title'], 'status': selected_agreement['status']}]
     else:
-        # Organisasjonsnummer match-es eksakt; navn kan søkes delvis.
-        digits = re.sub(r'\s', '', query)
-        if re.fullmatch(r'\d{9}', digits):
-            rows = [r for r in all_rows if r[0] == digits]
-            match_type = 'orgnr'
-        else:
-            exact = [r for r in all_rows if normalized(r[1]) == key]
-            rows = exact or [r for r in all_rows if key in normalized(r[1])]
-            match_type = 'name'
+        rows, match_type = find_customer_rows(query, register)
         shown_columns = [dict(a, index=i+2) for i, a in enumerate(agreements)]
     names = [normalized(r[1]) for r in rows]
     duplicate_names = sorted({r[1] for r in rows if names.count(normalized(r[1])) > 1})
@@ -92,5 +136,6 @@ def lookup(query: str, register: dict | None) -> dict:
         'customer_notice': ('Oppføring i datert kundeliste – ikke avropsgodkjenning. '
             'Tomme felt er ukjente, ikke Nei. Via beholdes som i originalen. '
             'VM er ikke bekreftet inngått i dette kildegrunnlaget.'),
-        'status': 'customer_matches' if rows else 'no_customer_match',
+        'status': ('customer_matches' if rows else 'customer_name_required'
+                   if match_type == 'name_required' else 'no_customer_match'),
     }

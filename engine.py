@@ -9,7 +9,7 @@ import time
 import urllib.error
 import urllib.request
 from pathlib import Path
-from customers import lookup, normalized, validate_register
+from customers import lookup, membership_question, normalized, validate_register
 
 ROOT = Path(__file__).resolve().parent
 MAX_QUESTION = 1500
@@ -47,6 +47,18 @@ def load_corpus(path: Path = ROOT / "corpus.json") -> dict:
     from urllib.parse import urlsplit
     raw = path.read_bytes()
     data = json.loads(raw)
+    # Keep the frequently changing VM plan separate from the large customer snapshot.
+    vm_path = path.with_name("vm.json")
+    vm_raw = vm_path.read_bytes() if vm_path.is_file() else b""
+    if vm_raw:
+        vm = json.loads(vm_raw)
+        if not isinstance(vm, dict) or not isinstance(vm.get("source"), dict):
+            raise DemoError("Ugyldig VM-kildefil.")
+        if not isinstance(data.get("sources"), list):
+            raise DemoError("Kildesettet mangler.")
+        data["sources"].append(vm["source"])
+        data["vm_plan"] = vm.get("plan")
+        data["version"] = vm["version"]
     sources = data.get("sources")
     if not isinstance(sources, list) or not 1 <= len(sources) <= 100:
         raise DemoError("Kildesettet mangler eller er for stort.")
@@ -67,8 +79,15 @@ def load_corpus(path: Path = ROOT / "corpus.json") -> dict:
         if not isinstance(topics, list) or not all(isinstance(x, str) for x in topics):
             raise DemoError("Ugyldige avtaleetiketter.")
         ids.add(s["id"])
+    plan = data.get("vm_plan")
+    if plan is not None:
+        if (not isinstance(plan, dict) or plan.get("publicly_confirmed") is not False
+                or not all(isinstance(plan.get(k), str) and plan[k].strip()
+                           for k in ("expected_award_month", "as_of", "provenance", "display", "notice"))
+                or not re.fullmatch(r"\d{4}-(?:0[1-9]|1[0-2])", plan["expected_award_month"])):
+            raise DemoError("VM-planen mangler tydelig status eller kildegrunnlag.")
     validate_register(data.get("customer_register"), ids)
-    data["sha256"] = hashlib.sha256(raw).hexdigest()
+    data["sha256"] = hashlib.sha256(raw + (b"\0" + vm_raw if vm_raw else b"")).hexdigest()
     return data
 
 
@@ -185,18 +204,57 @@ def validate_answer(answer: dict, sources: list[dict]) -> dict:
     return answer
 
 
+def choose_mode(question: str, requested: str) -> str:
+    """Lookup and catalogue facts do not need a language model."""
+    if requested not in ('sources', 'ollama', 'customers') or not isinstance(question, str):
+        return requested
+    if requested == 'customers' or membership_question(question):
+        return 'customers'
+    key = normalized(question)
+    if (('avtaler' in key or 'avtaleoversikt' in key)
+            and any(w in key for w in ('oversikt', 'inngått', 'har mps', 'har markedsplassen'))):
+        return 'agreements'
+    if re.search(r'\bvm\b|\bvulnerability management\b|\bsårbarhetshåndtering\b', key):
+        return 'vm'
+    return requested
+
+
+def catalogue(corpus: dict) -> list[dict]:
+    """Display all six concluded areas; VM remains separately labelled as upcoming."""
+    areas = (corpus.get('customer_register') or {}).get('agreements', [])
+    result = []
+    for ident in ('cips', 'cloud_ra', 'crs', 'training', 'tppcm', 'cti'):
+        area = next((a for a in areas if a['id'] == ident), None)
+        source = next((s for s in corpus['sources'] if s.get('agreement_ids') == [ident]), None)
+        if area and source:
+            result.append(dict(area, source_id=source['id'], url=source['url']))
+    return result
+
+
 def ask(question: str, mode: str, model: str, corpus: dict, request=ollama_request) -> dict:
     start = time.perf_counter()
+    mode = choose_mode(question, mode)
     question = validate_question(question, 2 if mode == "customers" else 3)
-    if mode not in ("sources", "ollama", "customers"):
+    if mode not in ("sources", "ollama", "customers", "agreements", "vm"):
         raise DemoError("Ukjent modus.")
-    selected = retrieve(question, corpus) if mode != "customers" else []
+    selected = retrieve(question, corpus) if mode in ("sources", "ollama") else []
     result = {"mode": mode, "model": None, "sources": selected,
               "corpus_version": corpus["version"], "corpus_sha256": corpus["sha256"],
               "answer": None, "status": "source_matches" if selected else "no_source_match",
               "input_tokens": None, "output_tokens": None, "generation_tokens_per_second": None,
               "cost_nok": None, "cost_note": "Ikke målt; lokale tokens betyr ikke null totalkostnad.",
               "citation_check": "ikke relevant", "semantic_verification": "ikke utført"}
+    if mode in ("agreements", "vm"):
+        result["status"] = "agreement_overview" if mode == "agreements" else "vm_details"
+        result["vm_plan"] = corpus.get("vm_plan")
+        if mode == "agreements":
+            result["agreement_catalogue"] = catalogue(corpus)
+            ids = {"S6"} | {a["source_id"] for a in result["agreement_catalogue"]}
+        else:
+            ids = {"S25", "S23"}
+        result["sources"] = [s for s in corpus["sources"] if s["id"] in ids]
+        result["elapsed_seconds"] = round(time.perf_counter() - start, 4)
+        return result
     if mode == "customers":
         result.update(lookup(question, corpus.get("customer_register")))
         source_id = corpus["customer_register"]["source_id"]

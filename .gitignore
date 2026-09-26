@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+.venv/
+.env
+.env.*
+*.local.json
+*.local.csv
+*.local.md
+.DS_Store
+
+# Generated locally; public downloads use GitHub's source archive.
+/downloads/

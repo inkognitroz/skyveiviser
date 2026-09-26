@@ -7,7 +7,7 @@ import secrets
 import threading
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from engine import DemoError, ROOT, ask, installed_models, load_corpus
+from engine import DemoError, ROOT, ask, choose_mode, installed_models, load_corpus
 
 
 class DemoServer(ThreadingHTTPServer):
@@ -23,7 +23,7 @@ class DemoServer(ThreadingHTTPServer):
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = "Skyveiviser/0.3"
+    server_version = "Skyveiviser/0.4"
     def setup(self):
         super().setup()
         self.connection.settimeout(12)
@@ -101,7 +101,7 @@ class Handler(BaseHTTPRequestHandler):
             payload = json.loads(self.rfile.read(length))
             if not isinstance(payload, dict) or set(payload) - {"question", "mode", "model"}:
                 raise DemoError("Ugyldige forespørselsfelter.")
-            mode = payload.get("mode", "sources")
+            mode = choose_mode(payload.get("question"), payload.get("mode", "sources"))
             if mode == "ollama" and not self.server.enable_ollama:
                 raise DemoError("Lokal modellkjøring er ikke aktivert. Start med --ollama etter lokalsjekken.")
             result = ask(payload.get("question"), mode, payload.get("model", ""), self.server.corpus)

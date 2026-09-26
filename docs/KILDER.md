@@ -40,3 +40,13 @@ Et fullstendig kundevilkår ligger i den konkrete avtalen og eventuelle godkjent
 ## Tekniske kilder
 
 [Ollama chat-API](https://docs.ollama.com/api/chat) · [Ollama modelliste](https://docs.ollama.com/api/tags) · [Ollama FAQ](https://docs.ollama.com/faq)
+
+
+## VM-oppdatering 26. september 2026
+
+- S25: [Vulnerability Management Services](https://markedsplassen.anskaffelser.no/avtaler/vulnerability-scanning): innhold, frivillighet og ikke-eksklusivitet. Sidens eldre tentative tidsplan brukes ikke som bekreftelse på en gjennomført tildeling.
+- [MPS Nyhetsbrev sept26](https://markedsplassen.anskaffelser.no/nyhetsarkiv/mps-nyhetsbrev-sept26): fortsatt forhandlinger.
+- [Avtaleoversikt](https://markedsplassen.anskaffelser.no/avtaler-0): seks aktive områder og VM under kommende avtaler.
+- [Kundeliste](https://markedsplassen.anskaffelser.no/avtaler/kundeliste): Asker kommune 920125298 har Nei i alle sju tabellkolonner ved kontroll. Rå kundedata i denne utgaven er ikke endret.
+
+`vm.json` skiller et offisielt kildesammendrag fra en foreløpig plan oppgitt ved oppdateringen: oktober 2026. Oktoberdatoen ble ikke funnet i de gjennomgåtte offentlige sidene og merkes derfor uttrykkelig som ikke offentlig kildebekreftet. Ingen kontaktperson, intern samtale eller leverandørvurdering er lagt inn.
