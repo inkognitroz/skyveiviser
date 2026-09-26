@@ -15,7 +15,7 @@ Klargjort for lokal utprøving med åpne opplysninger — ikke for offentlig web
 
 Du trenger **Python 3.10+**, **Ollama som kjører**, og **en installert lokal modell** på samme maskin. Ingen ekstra Python-pakker trengs.
 
-1. **[Last ned Skyveiviser-delingspakke.zip](downloads/Skyveiviser-delingspakke.zip?raw=true)** og pakk den ut i **Nedlastinger**. Har du allerede pakket den ut, gå til neste steg.
+1. **[Last ned Skyveiviser-delingspakke.zip](https://raw.githubusercontent.com/inkognitroz/skyveiviser/main/downloads/Skyveiviser-delingspakke.zip)** og pakk den ut i **Nedlastinger**. Har du allerede pakket den ut, gå til neste steg.
 2. Åpne **Terminal** og kjør én gang:
 
    ```bash
